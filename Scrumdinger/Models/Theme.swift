@@ -9,7 +9,7 @@ import SwiftUI
 
 /// use the main color for a view’s background
 /// accent color for a view’s text.
-enum Theme: String, CaseIterable, Identifiable {
+enum Theme: String, CaseIterable, Identifiable, Codable {
     case bubblegum
     case buttercup
     case indigo
