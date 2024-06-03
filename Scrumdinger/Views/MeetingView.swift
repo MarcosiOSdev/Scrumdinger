@@ -6,43 +6,59 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct MeetingView: View {
+    
+    private var player: AVPlayer {
+        AVPlayer.sharedDingPlayer
+    }
+    
+    @Binding
+    var scrum: DailyScrum
+    
+    @StateObject
+    var scrumTimer = ScrumTimer()
+    
     var body: some View {
-        VStack {
-            ProgressView(value: 10, total: 15)
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("Seconds Elapsed")
-                        .font(.caption)
-                    Label("300", systemImage: "hourglass.tophalf.fill")
-                }
-                Spacer()
-                VStack(alignment: .trailing) {
-                    Text("Seconds Remaing")
-                        .font(.caption)
-                    Label("600", systemImage: "hourglass.bottomhalf.fill")
-                }
-            }
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Time remainging")
-            .accessibilityValue("10 minutes")
+        ZStack {
+            RoundedRectangle(cornerRadius: 16.0)
+                .fill(scrum.theme.mainColor)
             
-            Circle()
-                .strokeBorder(lineWidth: 24)
-            HStack {
-                Text("Speaker 1 of 3")
-                Spacer()
-                Button(action: {}, label: {
-                    Image(systemName: "forward.fill")
-                })
+            VStack {
+                
+                MeetingHeaderView(
+                    secondsElapsed: scrumTimer.secondsElapsed,
+                    secondsRemaining: scrumTimer.secondsRemaining,
+                    theme: scrum.theme)
+                
+                Circle()
+                    .strokeBorder(lineWidth: 24)
+                
+                MeetingFooterView(speakers: scrumTimer.speakers, skipAction: scrumTimer.skipSpeaker)
             }
-            .accessibilityLabel("Next speaker") // "Next speaker. Button" VoiceOver reads it because of button.
         }
         .padding()
+        .foregroundColor(scrum.theme.accentColor)
+        .onAppear {
+            scrumTimer.reset(lengthInMinutes: scrum.lengthInMinutes, attendees: scrum.attendees)
+            
+            // this closure is when speak's time expires.
+            scrumTimer.speakerChangedAction = {
+                player.seek(to: .zero)
+                player.play()
+            }
+            
+            scrumTimer.startScrum()
+        }
+        .onDisappear {
+            scrumTimer.stopScrum()
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        
     }
 }
 
 #Preview {
-    MeetingView()
+    MeetingView(scrum: .constant(DailyScrum.sampleData[0]))
 }
