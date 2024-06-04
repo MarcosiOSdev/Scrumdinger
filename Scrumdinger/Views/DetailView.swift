@@ -73,7 +73,7 @@ struct DetailView: View {
             }
         }
         .sheet(isPresented: $isPresentingEditView) {
-            NavigationStack {
+            NavigationScrum {
                 DetailEditView(scrum: $editingScrum)
                     .navigationTitle(scrum.title)
                     .toolbar {
@@ -95,7 +95,7 @@ struct DetailView: View {
 }
 
 #Preview {
-    NavigationStack {
+    NavigationScrum {
         DetailView(scrum: .constant(DailyScrum.sampleData[0]))
     }
 }

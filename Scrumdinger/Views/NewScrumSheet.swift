@@ -19,7 +19,7 @@ struct NewScrumSheet: View {
     var isPresentingNewScrumView: Bool
     
     var body: some View {
-        NavigationStack {
+        NavigationScrum {
             DetailEditView(scrum: $newScrum)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {

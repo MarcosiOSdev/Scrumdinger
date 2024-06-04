@@ -20,7 +20,7 @@ struct ScrumsView: View {
     let saveAction: ()->Void
     
     var body: some View {
-        NavigationStack {
+        NavigationScrum {
             List($scrums) { $scrum in
                 NavigationLink(destination: DetailView(scrum: $scrum)) {
                     CardView(scrum: scrum)
@@ -39,8 +39,8 @@ struct ScrumsView: View {
             .sheet(isPresented: $isPresentingNewScrumView) {
                 NewScrumSheet(scrums: $scrums, isPresentingNewScrumView: $isPresentingNewScrumView)
             }
-            .onChange(of: scenePhase) { oldValue, newValue in
-                if newValue == .inactive { saveAction() }
+            .onChange(of: scenePhase) { value in
+                if value == .inactive { saveAction() }
             }
         }
     }
