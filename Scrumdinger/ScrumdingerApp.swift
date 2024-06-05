@@ -10,8 +10,6 @@ import SwiftUI
 @main
 struct ScrumdingerApp: App {
     
-//    @State private var scrums = DailyScrum.sampleData
-    
     @StateObject private var store = ScrumStore()
     @State private var errorWrapper: ErrorWrapper?
     
