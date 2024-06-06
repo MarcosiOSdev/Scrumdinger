@@ -17,8 +17,14 @@ struct MeetingView: View {
     @Binding
     var scrum: DailyScrum
     
+    @State
+    private var isRecording = false
+    
     @StateObject
-    var scrumTimer = ScrumTimer()
+    private var scrumTimer = ScrumTimer()
+    
+    @StateObject
+    private var speechRecognizer = SpeechRecognizer()
     
     var body: some View {
         ZStack {
@@ -30,11 +36,14 @@ struct MeetingView: View {
                 MeetingHeaderView(
                     secondsElapsed: scrumTimer.secondsElapsed,
                     secondsRemaining: scrumTimer.secondsRemaining,
-                    theme: scrum.theme)
+                    theme: scrum.theme
+                )
                 
                 MeetingTimerView(
                     speakers: scrumTimer.speakers,
-                    theme: scrum.theme)
+                    theme: scrum.theme, 
+                    isRecording: isRecording
+                )
                 
                 MeetingFooterView(speakers: scrumTimer.speakers, skipAction: scrumTimer.skipSpeaker)
             }
@@ -58,14 +67,21 @@ struct MeetingView: View {
             player.seek(to: .zero)
             player.play()
         }
-        
+        speechRecognizer.resetTranscript()
+        speechRecognizer.startTranscribing()
+        isRecording = true
         scrumTimer.startScrum()
     }
     
     private func endScrum() {
         scrumTimer.stopScrum()
-        player.pause()        
-        let newHistory = History(attendees: scrum.attendees)
+        speechRecognizer.stopTranscribing()
+        isRecording = false
+        player.pause()
+        let newHistory = History(
+            attendees: scrum.attendees,
+            transcript: speechRecognizer.transcript
+        )
         scrum.history.insert(newHistory, at: 0)
     }
 }
