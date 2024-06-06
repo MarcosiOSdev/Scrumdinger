@@ -32,8 +32,9 @@ struct MeetingView: View {
                     secondsRemaining: scrumTimer.secondsRemaining,
                     theme: scrum.theme)
                 
-                Circle()
-                    .strokeBorder(lineWidth: 24)
+                MeetingTimerView(
+                    speakers: scrumTimer.speakers,
+                    theme: scrum.theme)
                 
                 MeetingFooterView(speakers: scrumTimer.speakers, skipAction: scrumTimer.skipSpeaker)
             }
@@ -63,6 +64,7 @@ struct MeetingView: View {
     
     private func endScrum() {
         scrumTimer.stopScrum()
+        player.pause()        
         let newHistory = History(attendees: scrum.attendees)
         scrum.history.insert(newHistory, at: 0)
     }

@@ -39,7 +39,13 @@ final class ScrumTimer: ObservableObject {
 
 
     private weak var timer: Timer?
-    private var timerStopped = false
+    private var timerStopped = false {
+        didSet {
+            if timerStopped {
+                secondsElapsed = lengthInSeconds
+            }
+        }
+    }
     private var frequency: TimeInterval { 1.0 / 60.0 }
     private var lengthInSeconds: Int { lengthInMinutes * 60 }
     private var secondsPerSpeaker: Int {
@@ -107,15 +113,19 @@ final class ScrumTimer: ObservableObject {
 
 
     nonisolated private func update() {
-
-
         Task { @MainActor in
             guard let startDate,
                   !timerStopped else { return }
             let secondsElapsed = Int(Date().timeIntervalSince1970 - startDate.timeIntervalSince1970)
             secondsElapsedForSpeaker = secondsElapsed
             self.secondsElapsed = secondsPerSpeaker * speakerIndex + secondsElapsedForSpeaker
+            
+            // Verify if secondsElapse is greater than secondsPerSpeaker
             guard secondsElapsed <= secondsPerSpeaker else {
+                // if is the last speaker should be stop time
+                if (speakers.count - 1) == speakerIndex {
+                    timerStopped = true
+                }
                 return
             }
             secondsRemaining = max(lengthInSeconds - self.secondsElapsed, 0)
