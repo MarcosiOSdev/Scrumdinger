@@ -19,7 +19,6 @@ struct ThemePicker: View {
                     .tag(theme)
             }
         }
-//        .pickerStyle(.navigationLink)
         .scrumPickerStyle()
     }
 }
